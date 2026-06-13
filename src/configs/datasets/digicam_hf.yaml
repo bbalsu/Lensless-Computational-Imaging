@@ -1,0 +1,17 @@
+train:
+  _target_: src.datasets.digicam_hf_dataset.DigiCamHFDataset
+  split: train
+  masks_dir: data/masks
+  hf_repo: bezzam/DigiCam-Mirflickr-MultiMask-10K
+  limit: null
+  shuffle_index: true
+  instance_transforms: null
+
+val:
+  _target_: src.datasets.digicam_hf_dataset.DigiCamHFDataset
+  split: test
+  masks_dir: data/masks
+  hf_repo: bezzam/DigiCam-Mirflickr-MultiMask-10K
+  limit: null
+  shuffle_index: false
+  instance_transforms: null
