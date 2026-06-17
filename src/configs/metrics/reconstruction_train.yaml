@@ -1,0 +1,11 @@
+metrics:
+  - _target_: src.metrics.PSNRMetric
+    name: psnr
+    data_range: 1.0
+    clip: true
+
+  - _target_: src.metrics.SSIMMetric
+    name: ssim
+    data_range: 1.0
+    clip: true
+    device: ${device}

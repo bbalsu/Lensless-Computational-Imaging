@@ -1,0 +1,43 @@
+defaults:
+  - datasets: digicam_hf
+  - dataloader: example
+  - model: unrolled_admm
+  - metrics: reconstruction_train
+  - writer: cometml
+  - _self_
+
+device: cuda
+
+train_limit: 64
+val_limit: 16
+
+trainer:
+  _target_: src.trainer.ReconstructionTrainer
+  n_epochs: 1
+  save_dir: checkpoints/unrolled_admm
+  resume_from: null
+  from_pretrained: null
+  save_period: 1
+  monitor: min val_loss
+  early_stop: 100
+  log_step: 50
+  max_grad_norm: null
+  device_tensors: ["measurement", "psf", "target_roi"]
+  log_first_n_images: 3
+
+loss:
+  _target_: src.loss.ReconstructionLoss
+  mse_weight: 1.0
+  lpips_weight: 0.1
+  lpips_net: vgg
+  clip: true
+  device: ${device}
+
+optimizer:
+  _target_: torch.optim.Adam
+  lr: 1e-3
+
+lr_scheduler: null
+
+logging:
+  log_comet: false
