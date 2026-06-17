@@ -1,0 +1,17 @@
+defaults:
+  - datasets: digicam_hf
+  - dataloader: example
+  - model: admm
+  - metrics: reconstruction
+  - writer: cometml
+  - _self_
+
+split: test
+limit: 8
+device: cuda
+out_dir: outputs/admm_eval
+
+logging:
+  log_comet: true
+  log_table: true
+  log_first_n_images: 3
