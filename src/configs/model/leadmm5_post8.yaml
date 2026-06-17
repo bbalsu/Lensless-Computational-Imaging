@@ -1,0 +1,22 @@
+_target_: src.model.ModularLeADMM
+
+pre: null
+
+reconstructor:
+  _target_: src.model.ADMMReconstructor
+  num_iters: 5
+  trainable: true
+  padded_hw: [768, 1024]
+  psf_gain: 4.41522815
+  mu1_init: 1e-4
+  mu2_init: 1e-4
+  mu3_init: 1e-4
+  tau_init: 2e-4
+
+post:
+  _target_: src.model.DRUNetLike
+  in_channels: 3
+  out_channels: 3
+  channels: [32, 64, 128, 256]
+  num_blocks: 4
+  residual: true
