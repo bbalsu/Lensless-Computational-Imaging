@@ -45,7 +45,8 @@ class CometMLWriter:
             self.run_id = run_id
 
             resume = False
-            if project_config["trainer"].get("resume_from") is not None:
+            trainer_config = project_config.get("trainer", {})
+            if trainer_config.get("resume_from") is not None:
                 resume = True
 
             if resume:
@@ -79,8 +80,6 @@ class CometMLWriter:
             logger.warning("For use comet_ml install it via \n\t pip install comet_ml")
 
         self.step = 0
-        # the mode is usually equal to the current partition name
-        # used to separate Partition1 and Partition2 metrics
         self.mode = ""
         self.timer = datetime.now()
 
@@ -131,8 +130,6 @@ class CometMLWriter:
             checkpoint_path (str): path to the checkpoint file.
             save_dir (str): path to the dir, where checkpoint is saved.
         """
-        # For comet, save dir is not required
-        # It is kept for consistency with WandB
         self.exp.log_model(
             name="checkpoints", file_or_folder=checkpoint_path, overwrite=True
         )
@@ -219,14 +216,7 @@ class CometMLWriter:
                 histogram of.
             bins (int | str): the definition of bins for the histogram.
         """
-        # For comet, bins argument is not required
-        # It is kept for consistency with WandB
-
         values_for_hist = values_for_hist.detach().cpu().numpy()
-
-        # np_hist = np.histogram(values_for_hist, bins=bins)
-        # if np_hist[0].shape[0] > 512:
-        #     np_hist = np.histogram(values_for_hist, bins=512)
 
         self.exp.log_histogram_3d(
             values=values_for_hist, name=self._object_name(hist_name), step=self.step
@@ -241,7 +231,6 @@ class CometMLWriter:
             table (DataFrame): table content.
         """
         self.exp.set_step(self.step)
-        # log_table does not support step directly
         self.exp.log_table(
             filename=self._object_name(table_name) + ".csv",
             tabular_data=table,
