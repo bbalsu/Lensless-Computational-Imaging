@@ -1,0 +1,6 @@
+inference:
+  _target_: src.datasets.custom_dir_dataset.CustomDirDataset
+  data_dir: ???
+  limit: null
+  shuffle_index: false
+  instance_transforms: null

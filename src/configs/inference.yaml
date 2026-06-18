@@ -1,13 +1,21 @@
 defaults:
-  - model: baseline
-  - metrics: example
-  - datasets: example_eval # we do not want to run inference on training data
+  - model: leadmm5_pre4_post4
+  - datasets: custom_dir
   - dataloader: example
-  - transforms: example
   - _self_
+
 inferencer:
-  device_tensors: ["data_object", "labels"] # which tensors should be on device (ex. GPU)
-  device: auto # device name or "auto"
-  save_path: "example" # any name here, can be a dataset name
+  device: auto
   seed: 1
-  from_pretrained: "saved/model_best.pth" # path to the pretrained model
+
+  dataset_part: null
+
+  from_pretrained: null
+  auto_download: true
+  strict_load: true
+
+  output_dir: outputs/inference
+
+  device_tensors:
+    - measurement
+    - psf
