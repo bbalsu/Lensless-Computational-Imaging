@@ -2,7 +2,7 @@ _target_: src.model.admm.ADMMReconstructor
 num_iters: 100
 trainable: false
 padded_hw: [768, 1024]
-psf_gain: 5.0
+psf_gain: 4.41522815
 mu1_init: 1e-4
 mu2_init: 1e-4
 mu3_init: 1e-4

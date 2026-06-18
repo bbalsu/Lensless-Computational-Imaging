@@ -1,0 +1,64 @@
+defaults:
+  - metrics: reconstruction
+  - _self_
+
+datasets:
+  train:
+    _target_: src.datasets.digicam_hf_dataset.DigiCamHFDataset
+    split: train
+    masks_dir: data/masks
+    hf_repo: bezzam/DigiCam-Mirflickr-MultiMask-10K
+    limit: null
+    shuffle_index: false
+    instance_transforms: null
+
+  val:
+    _target_: src.datasets.digicam_hf_dataset.DigiCamHFDataset
+    split: test
+    masks_dir: data/masks
+    hf_repo: bezzam/DigiCam-Mirflickr-MultiMask-10K
+    limit: null
+    shuffle_index: false
+    instance_transforms: null
+
+model:
+  _target_: src.model.ADMMReconstructor
+  num_iters: 100
+  trainable: false
+  padded_hw: [768, 1024]
+  psf_gain: 4.41522815
+  mu1_init: 1e-4
+  mu2_init: 1e-4
+  mu3_init: 1e-4
+  tau_init: 2e-4
+
+restoration:
+  _target_: src.model.RealESRGANRestorer
+  weights_path: checkpoints/restoration/RealESRGAN_x4plus.pth
+  device: ${device}
+  tile: 256
+  half: false
+
+writer:
+  _target_: src.logger.CometMLWriter
+  _recursive_: false
+  project_name: pytorch_template
+  workspace: null
+  run_id: null
+  run_name: admm100-realesrgan
+  mode: online
+  loss_names: []
+  log_checkpoints: false
+
+device: cuda
+
+evaluation:
+  split: val
+  limit: 20
+  batch_size: 2
+  num_workers: 0
+  log_first_n_images: 8
+  out_dir: outputs/admm100_realesrgan_eval
+
+logging:
+  log_comet: true
