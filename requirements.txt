@@ -1,7 +1,7 @@
-torch==2.2.0
-torchvision==0.17.0
-torchmetrics
-numpy==1.26.4
+torch==2.11.0
+torchvision==0.26.0
+torchmetrics==1.9.0
+numpy==2.0.2
 scipy
 opencv-python
 pillow
@@ -14,7 +14,6 @@ omegaconf
 lpips
 gdown
 requests
-wandb
 comet-ml
 
 waveprop @ git+https://github.com/ebezzam/waveprop.git

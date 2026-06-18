@@ -64,7 +64,7 @@ def download_checkpoint(model_name, force=False):
         print(f"Checkpoint already exists: {checkpoint_path}")
         return checkpoint_path
 
-    url = f"https: //drive.google.com/uc?id={checkpoint_info['file_id']}"
+    url = f"https://drive.google.com/uc?id={checkpoint_info['file_id']}"
     print(f"Downloading checkpoint for {model_name} to {checkpoint_path}")
     gdown.download(url, str(checkpoint_path), quiet=False)
 
