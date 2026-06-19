@@ -1,4 +1,3 @@
-import logging
 from pathlib import Path
 
 import hydra
@@ -9,59 +8,22 @@ from omegaconf import DictConfig, OmegaConf
 from torchvision.utils import make_grid, save_image
 from tqdm import tqdm
 
-from src.datasets.collate import collate_fn
 from src.metrics.metric_utils import make_metric_objects
 from src.metrics.tracker import MetricTracker
 from src.model.fft_operators import center_crop
+from src.utils.eval_utils import (
+    build_writer,
+    get_dataset_by_split,
+    limit_dataset,
+    make_loader,
+    resolve_device,
+)
 
 
 def crop_like(image, target):
     if image.shape[-2:] == target.shape[-2:]:
         return image
     return center_crop(image, target.shape[-2:])
-
-
-def limit_dataset(dataset, limit):
-    if limit is None:
-        return dataset
-
-    if limit <= 0:
-        return dataset
-
-    if hasattr(dataset, "_index"):
-        dataset._index = dataset._index[:limit]
-
-    return dataset
-
-
-def make_loader(dataset, batch_size, num_workers):
-    return torch.utils.data.DataLoader(
-        dataset,
-        batch_size=batch_size,
-        shuffle=False,
-        num_workers=num_workers,
-        pin_memory=False,
-        drop_last=False,
-        collate_fn=collate_fn,
-    )
-
-
-def build_writer(cfg):
-    if not cfg.logging.log_comet:
-        return None
-
-    logger = logging.getLogger("evaluate_admm_realesrgan")
-
-    try:
-        writer = instantiate(
-            cfg.writer,
-            logger=logger,
-            project_config=cfg,
-        )
-        return writer
-    except Exception as exc:
-        print("Comet writer was not created:", exc)
-        return None
 
 
 def save_and_log_images(
@@ -142,6 +104,7 @@ def evaluate_split(
         dataset=dataset,
         batch_size=cfg.evaluation.batch_size,
         num_workers=cfg.evaluation.num_workers,
+        pin_memory=False,
     )
 
     metric_keys = []
@@ -241,9 +204,7 @@ def main(cfg: DictConfig):
     print("Resolved config:")
     print(OmegaConf.to_yaml(cfg, resolve=True))
 
-    device = cfg.device
-    if device == "cuda" and not torch.cuda.is_available():
-        device = "cpu"
+    device = resolve_device(cfg.device)
 
     datasets = instantiate(cfg.datasets)
 
@@ -254,38 +215,15 @@ def main(cfg: DictConfig):
 
     metrics = make_metric_objects(cfg)
 
-    writer = build_writer(cfg)
+    writer = build_writer(
+        cfg=cfg,
+        logger_name="evaluate_admm_realesrgan",
+    )
 
     out_dir = Path(cfg.evaluation.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    if cfg.evaluation.split == "train":
-        evaluate_split(
-            cfg=cfg,
-            split_name="train",
-            dataset=datasets["train"],
-            admm_model=admm_model,
-            restorer=restorer,
-            metrics=metrics,
-            writer=writer,
-            device=device,
-            out_dir=out_dir,
-        )
-
-    elif cfg.evaluation.split in ["val", "test"]:
-        evaluate_split(
-            cfg=cfg,
-            split_name="val",
-            dataset=datasets["val"],
-            admm_model=admm_model,
-            restorer=restorer,
-            metrics=metrics,
-            writer=writer,
-            device=device,
-            out_dir=out_dir,
-        )
-
-    elif cfg.evaluation.split == "both":
+    if cfg.evaluation.split == "both":
         evaluate_split(
             cfg=cfg,
             split_name="train",
@@ -309,9 +247,22 @@ def main(cfg: DictConfig):
             device=device,
             out_dir=out_dir,
         )
+        return
 
-    else:
-        raise ValueError("Unknown split: {}".format(cfg.evaluation.split))
+    dataset = get_dataset_by_split(datasets, cfg.evaluation.split)
+    split_name = "train" if cfg.evaluation.split == "train" else "val"
+
+    evaluate_split(
+        cfg=cfg,
+        split_name=split_name,
+        dataset=dataset,
+        admm_model=admm_model,
+        restorer=restorer,
+        metrics=metrics,
+        writer=writer,
+        device=device,
+        out_dir=out_dir,
+    )
 
 
 if __name__ == "__main__":

@@ -1,0 +1,63 @@
+datasets:
+  train:
+    _target_: src.datasets.digicam_hf_dataset.DigiCamHFDataset
+    split: train
+    masks_dir: data/masks
+    hf_repo: bezzam/DigiCam-Mirflickr-MultiMask-10K
+    limit: null
+    shuffle_index: false
+    instance_transforms: null
+
+  val:
+    _target_: src.datasets.digicam_hf_dataset.DigiCamHFDataset
+    split: test
+    masks_dir: data/masks
+    hf_repo: bezzam/DigiCam-Mirflickr-MultiMask-10K
+    limit: null
+    shuffle_index: false
+    instance_transforms: null
+
+writer:
+  _target_: src.logger.CometMLWriter
+  _recursive_: false
+  project_name: pytorch_template
+  workspace: null
+  run_id: null
+  run_name: reconstruction-speed-all-methods
+  mode: online
+  loss_names: []
+  log_checkpoints: false
+
+device: cuda
+
+benchmark:
+  split: val
+  limit: 52
+  batch_size: 1
+  num_workers: 0
+  warmup_batches: 2
+  out_dir: outputs/reconstruction_speed
+
+methods:
+  - name: admm100
+    model_config: admm
+    checkpoint_path: null
+
+  - name: unrolled_admm20
+    model_config: unrolled_admm
+    checkpoint_path: checkpoints/unrolled_admm/unrolled-admm-20-full-df-bs4-lr1e-4/model_best.pth
+
+  - name: leadmm5_pre8
+    model_config: leadmm5_pre8
+    checkpoint_path: checkpoints/unrolled_admm/leadmm5-pre8/model_best.pth
+
+  - name: leadmm5_post8
+    model_config: leadmm5_post8
+    checkpoint_path: checkpoints/unrolled_admm/leadmm5-post8/model_best.pth
+
+  - name: leadmm5_pre4_post4
+    model_config: leadmm5_pre4_post4
+    checkpoint_path: checkpoints/unrolled_admm/leadmm5-pre4-post4/model_best_psnr.pth
+
+logging:
+  log_comet: true
