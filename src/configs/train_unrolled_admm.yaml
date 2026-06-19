@@ -8,8 +8,8 @@ defaults:
 
 device: cuda
 
-train_limit: 64
-val_limit: 16
+train_limit: null
+val_limit: null
 
 trainer:
   _target_: src.trainer.ReconstructionTrainer
@@ -28,14 +28,14 @@ trainer:
 loss:
   _target_: src.loss.ReconstructionLoss
   mse_weight: 1.0
-  lpips_weight: 0.1
+  lpips_weight: 1.0
   lpips_net: vgg
   clip: true
   device: ${device}
 
 optimizer:
   _target_: torch.optim.Adam
-  lr: 1e-3
+  lr: 1e-4
 
 lr_scheduler: null
 

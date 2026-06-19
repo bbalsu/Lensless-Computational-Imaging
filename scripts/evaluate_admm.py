@@ -13,7 +13,7 @@ from src.datasets.collate import collate_fn
 from src.lensless_helpers.preprocessor import ALIGNMENT
 from src.logger import setup_logging
 from src.metrics.tracker import MetricTracker
-from src.metrics.utils import make_metric_objects
+from src.metrics.metric_utils import make_metric_objects
 from src.utils.reconstruction_utils import crop_roi_chw, tensor_to_image
 
 
