@@ -1,9 +1,8 @@
 cff-version: 1.2.0
-message: "If you use this template, please cite it as below."
-title: "PyTorch Project Template"
+message: "If you use this project, please cite it as below."
+title: "Lensless Computational Imaging — Final Project for the AI360 Deep Learning Course"
 authors:
-  - family-names: Grinberg
-    given-names: Petr
-    orcid: https://orcid.org/0009-0008-4480-5595
-date-released: 2024-09-01
-url: https://github.com/Blinorot/pytorch_project_template
+  - family-names: Aldag
+    given-names: Alsu
+date-released: 2025-06-19
+url: https://github.com/bbalsu/Lensless-Computational-Imaging
