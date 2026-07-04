@@ -1,0 +1,24 @@
+defaults:
+  - datasets: digicam_hf
+  - dataloader: example
+  - model: leadmm5_pre4_post4
+  - metrics: reconstruction
+  - writer: cometml
+  - _self_
+
+# In datasets/digicam_hf.yaml, key "val" corresponds to HF split="test".
+split: test
+limit: null
+
+device: cuda
+out_dir: outputs/eval_reconstruction
+
+evaluator:
+  from_pretrained: null
+  auto_download: true
+  strict_load: true
+
+logging:
+  log_comet: false
+  log_table: true
+  log_first_n_images: 3
